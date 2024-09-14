@@ -126,7 +126,7 @@ public class UserController {
 		// System.out.println(request);
 		UserDtls user = getLoggedInUserDetails(p);
 		orderService.saveOrder(user.getId(), request);
-
+		cartService.clearCartByUser(user.getId());
 		return "redirect:/user/success";
 	}
 

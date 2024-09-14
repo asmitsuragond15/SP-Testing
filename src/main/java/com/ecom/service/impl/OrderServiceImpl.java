@@ -69,6 +69,7 @@ public class OrderServiceImpl implements OrderService {
 
 			ProductOrder saveOrder = orderRepository.save(order);
 			commonUtil.sendMailForProductOrder(saveOrder, "success");
+			
 		}
 	}
 
