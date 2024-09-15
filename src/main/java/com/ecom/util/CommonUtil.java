@@ -55,14 +55,16 @@ public class CommonUtil {
 	public Boolean sendMailForProductOrder(ProductOrder order,String status) throws Exception
 	{
 		
-		msg="<p>Hello [[name]],</p>"
-				+ "<p>Thank you order <b>[[orderStatus]]</b>.</p>"
-				+ "<p><b>Product Details:</b></p>"
-				+ "<p>Name : [[productName]]</p>"
-				+ "<p>Category : [[category]]</p>"
-				+ "<p>Quantity : [[quantity]]</p>"
-				+ "<p>Price : [[price]]</p>"
-				+ "<p>Payment Type : [[paymentType]]</p>";
+		msg="""
+                <p>Hello [[name]],</p>\
+                <p>Thank you order <b>[[orderStatus]]</b>.</p>\
+                <p><b>Product Details:</b></p>\
+                <p>Name : [[productName]]</p>\
+                <p>Category : [[category]]</p>\
+                <p>Quantity : [[quantity]]</p>\
+                <p>Price : [[price]]</p>\
+                <p>Payment Type : [[paymentType]]</p>\
+                """;
 		
 		MimeMessage message = mailSender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(message);

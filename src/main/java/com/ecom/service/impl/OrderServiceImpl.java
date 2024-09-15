@@ -34,44 +34,52 @@ public class OrderServiceImpl implements OrderService {
 	@Autowired
 	private CommonUtil commonUtil;
 
+
 	@Override
 	public void saveOrder(Integer userid, OrderRequest orderRequest) throws Exception {
 
-		List<Cart> carts = cartRepository.findByUserId(userid);
+	    List<Cart> carts = cartRepository.findByUserId(userid);
 
-		for (Cart cart : carts) {
+	    for (Cart cart : carts) {
 
-			ProductOrder order = new ProductOrder();
+	        ProductOrder order = new ProductOrder();
 
-			order.setOrderId(UUID.randomUUID().toString());
-			order.setOrderDate(LocalDate.now());
+	        order.setOrderId(UUID.randomUUID().toString());
+	        order.setOrderDate(LocalDate.now());
 
-			order.setProduct(cart.getProduct());
-			order.setPrice(cart.getProduct().getDiscountPrice());
+	        order.setProduct(cart.getProduct());
+	        order.setPrice(cart.getProduct().getDiscountPrice()+ 50 + 10);
+	        order.setQuantity(cart.getQuantity());
+	        order.setUser(cart.getUser());
 
-			order.setQuantity(cart.getQuantity());
-			order.setUser(cart.getUser());
+	        order.setStatus(OrderStatus.IN_PROGRESS.getName());
+	        order.setPaymentType(orderRequest.getPaymentType());
 
-			order.setStatus(OrderStatus.IN_PROGRESS.getName());
-			order.setPaymentType(orderRequest.getPaymentType());
+	        OrderAddress address = new OrderAddress();
+	        address.setFirstName(orderRequest.getFirstName());
+	        address.setLastName(orderRequest.getLastName());
+	        address.setEmail(orderRequest.getEmail());
+	        address.setMobileNo(orderRequest.getMobileNo());
+	        address.setAddress(orderRequest.getAddress());
+	        address.setCity(orderRequest.getCity());
+	        address.setState(orderRequest.getState());
+	        address.setPincode(orderRequest.getPincode());
 
-			OrderAddress address = new OrderAddress();
-			address.setFirstName(orderRequest.getFirstName());
-			address.setLastName(orderRequest.getLastName());
-			address.setEmail(orderRequest.getEmail());
-			address.setMobileNo(orderRequest.getMobileNo());
-			address.setAddress(orderRequest.getAddress());
-			address.setCity(orderRequest.getCity());
-			address.setState(orderRequest.getState());
-			address.setPincode(orderRequest.getPincode());
+	        order.setOrderAddress(address);
 
-			order.setOrderAddress(address);
+	        ProductOrder savedOrder = orderRepository.save(order);
 
-			ProductOrder saveOrder = orderRepository.save(order);
-			commonUtil.sendMailForProductOrder(saveOrder, "success");
-			
-		}
+	        // Handle order based on payment type
+	        if ("ONLINE".equals(orderRequest.getPaymentType())) {
+	            // Additional logic if needed for online payments
+	            commonUtil.sendMailForProductOrder(savedOrder, "Online");
+	        } else {
+	            // For COD, you might want to notify the user or take additional steps
+	            commonUtil.sendMailForProductOrder(savedOrder, "COD");
+	        }
+	    }
 	}
+
 
 	@Override
 	public List<ProductOrder> getOrdersByUser(Integer userId) {
