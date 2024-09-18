@@ -5,13 +5,46 @@
     <meta charset="ISO-8859-1">
     <title>Insert title here</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/css/style.css">
+
+    <!-- Internal CSS -->
+    <style>
+        body {
+            padding-top: 56px; /* Adjust based on navbar height */
+        }
+        
+        /* Navbar styles */
+        .navbar {
+            background-color: #000; /* Black background */
+        }
+        .navbar-nav .nav-link {
+            color: #fff !important; /* White text color */
+        }
+        .navbar-nav .nav-link.active, 
+        .navbar-nav .nav-link:hover {
+            color: #ddd !important; /* Lighter gray for hover/active state */
+        }
+        .navbar-brand {
+            color: #fff !important; /* White text color for brand */
+        }
+        .navbar-toggler-icon {
+            background-image: url('data:image/svg+xml;charset=utf8,%3Csvg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"%3E%3Cpath stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /%3E%3C/svg%3E');
+        }
+        .dropdown-menu {
+            background-color: #333; /* Darker background for dropdown */
+        }
+        .dropdown-item {
+            color: #fff; /* White text for dropdown items */
+        }
+        .dropdown-item:hover {
+            background-color: #555; /* Lighter gray for hover effect */
+        }
+    </style>
 </head>
 <body>
     <!-- Start Navbar -->
-    <nav class="navbar navbar-expand-lg bg-primary fixed-top navbar-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#"><i class="fa-solid fa-cart-shopping"></i> Ecom Store</a>
+            <a class="navbar-brand" href="#"><i class="fa-solid fa-cart-shopping"></i> RevShop</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
                     aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>

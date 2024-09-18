@@ -9,6 +9,8 @@ import com.ecom.model.UserDtls;
 public interface UserService {
 
 	public UserDtls saveUser(UserDtls user);
+	
+	public UserDtls getUserById(int id);
 
 	public UserDtls getUserByEmail(String email);
 

@@ -8,10 +8,15 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.Principal;
+import java.util.Date;
 import java.util.List;
-import java.util.Random;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collector;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -20,6 +25,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,17 +33,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.ecom.model.Category;
-import com.ecom.model.Product;
-import com.ecom.model.UserDtls;
-import com.ecom.service.CartService;
-import com.ecom.service.CategoryService;
-import com.ecom.service.ProductService;
-import com.ecom.service.UserService;
-import com.ecom.util.CommonUtil;
 
-import io.micrometer.common.util.StringUtils;
+import com.ecom.model.*;
+import com.ecom.service.impl.*;
+import com.ecom.service.*;
+import com.ecom.util.*;
+
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -45,100 +48,141 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 public class HomeController {
 
-	@Autowired
-	private CategoryService categoryService;
+    @Autowired
+    private CategoryService categoryService;
 
-	@Autowired
-	private ProductService productService;
+    @Autowired
+    private ProductService productService;
 
-	@Autowired
-	private UserService userService;
+    @Autowired
+    private UserService userService;
 
-	@Autowired
-	private CommonUtil commonUtil;
+    @Autowired
+    private ReviewService reviewService;  // Add ReviewService
 
-	@Autowired
-	private BCryptPasswordEncoder passwordEncoder;
+    @Autowired
+    private CommonUtil commonUtil;
 
-	@Autowired
-	private CartService cartService;
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
-	@ModelAttribute
-	public void getUserDetails(Principal p, Model m) {
-		if (p != null) {
-			String email = p.getName();
-			UserDtls userDtls = userService.getUserByEmail(email);
-			m.addAttribute("user", userDtls);
-			Integer countCart = cartService.getCountCart(userDtls.getId());
-			m.addAttribute("countCart", countCart);
-		}
+    @Autowired
+    private CartService cartService;
 
-		List<Category> allActiveCategory = categoryService.getAllActiveCategory();
-		m.addAttribute("categorys", allActiveCategory);
-	}
+    @ModelAttribute
+    public void getUserDetails(Principal p, Model m) {
+        if (p != null) {
+            String email = p.getName();
+            UserDtls userDtls = userService.getUserByEmail(email);
+            m.addAttribute("user", userDtls);
+            Integer countCart = cartService.getCountCart(userDtls.getId());
+            m.addAttribute("countCart", countCart);
+        }
 
-	@GetMapping("/")
-	public String index(Model m) {
+        List<Category> allActiveCategory = categoryService.getAllActiveCategory();
+        m.addAttribute("categories", allActiveCategory);
+    }
 
-		List<Category> allActiveCategory = categoryService.getAllActiveCategory().stream()
-				.sorted((c1, c2) -> c2.getId().compareTo(c1.getId())).limit(6).toList();
-		List<Product> allActiveProducts = productService.getAllActiveProducts("").stream()
-				.sorted((p1, p2) -> p2.getId().compareTo(p1.getId())).limit(8).toList();
-		m.addAttribute("category", allActiveCategory);
-		m.addAttribute("products", allActiveProducts);
-		return "index";
-	}
+    @GetMapping("/")
+    public String index(Model m) {
+        List<Category> allActiveCategory = categoryService.getAllActiveCategory().stream()
+            .sorted((c1, c2) -> c2.getId().compareTo(c1.getId()))
+            .limit(6).toList();
+        List<Product> allActiveProducts = productService.getAllActiveProducts("").stream()
+            .sorted((p1, p2) -> p2.getId().compareTo(p1.getId()))
+            .limit(8).toList();
+        m.addAttribute("category", allActiveCategory);
+        m.addAttribute("products", allActiveProducts);
+        return "index";
+    }
+
+    @GetMapping("/signin")
+    public String login() {
+        return "login"; 
+    }
+
+    @GetMapping("/register")
+    public String register() {
+        return "register";
+    }
+
+    @GetMapping("/products")
+    public String products(Model m, @RequestParam(value = "category", defaultValue = "") String category,
+            @RequestParam(name = "pageNo", defaultValue = "0") Integer pageNo,
+            @RequestParam(name = "pageSize", defaultValue = "12") Integer pageSize,
+            @RequestParam(defaultValue = "") String ch) {
+
+        List<Category> categories = categoryService.getAllActiveCategory();
+        m.addAttribute("paramValue", category);
+        m.addAttribute("categories", categories);
+
+        Page<Product> page = StringUtils.isEmpty(ch)
+            ? productService.getAllActiveProductPagination(pageNo, pageSize, category)
+            : productService.searchActiveProductPagination(pageNo, pageSize, category, ch);
+
+        List<Product> products = page.getContent();
+        m.addAttribute("products", products);
+        m.addAttribute("productsSize", products.size());
+
+        m.addAttribute("pageNo", page.getNumber());
+        m.addAttribute("pageSize", pageSize);
+        m.addAttribute("totalElements", page.getTotalElements());
+        m.addAttribute("totalPages", page.getTotalPages());
+        m.addAttribute("isFirst", page.isFirst());
+        m.addAttribute("isLast", page.isLast());
+
+        return "product";
+    }
+
+    @GetMapping("/product/{id}")
+    public String product(@PathVariable int id, Model m) {
+        Product productById = productService.getProductById(id);
+        List<ReviewModel> reviews = reviewService.getReviewsByProductId(id); // Fetch reviews
+
+        m.addAttribute("product", productById);
+        m.addAttribute("reviews", reviews); // Add reviews to the model
+        return "view_product";
+    }
+
+    @PostMapping("/saveReview")
+    public String saveReview(
+        @RequestParam("productId") int productId,
+        @RequestParam("userId") int userId,
+        @RequestParam("rating") int rating,
+        @RequestParam("comment") String comment,
+        RedirectAttributes redirectAttributes) {
+
+        // Set current date and time
+        LocalDateTime reviewDate = LocalDateTime.now();
+
+        // Assuming you have methods to fetch Product and User by their IDs
+        Optional<Product> productOpt = Optional.ofNullable(productService.getProductById(productId));
+        Optional<UserDtls> userOpt = Optional.ofNullable(userService.getUserById(userId));
+
+        if (!productOpt.isPresent() || !userOpt.isPresent()) {
+            redirectAttributes.addFlashAttribute("errorMsg", "Invalid product or user");
+            return "redirect:/product/" + productId;
+        }
+
+        Product product = productOpt.get();
+        UserDtls user = userOpt.get();
+
+        ReviewModel review = new ReviewModel();
+        review.setProduct(product);
+        review.setUser(user);
+        review.setRating(rating);
+        review.setComment(comment);
+        review.setDate(reviewDate);
+
+        // Save review
+        reviewService.saveReview(review);
+
+        redirectAttributes.addFlashAttribute("succMsg", "Review submitted successfully");
+        return "redirect:/product/" + productId;
+    }
 
 
-	@GetMapping("/signin")
-	public String login() {
-		return "login"; 
-	}
- 
-	@GetMapping("/register")
-	public String register() {
-		return "register";
-	}
-
-	@GetMapping("/products")
-	public String products(Model m, @RequestParam(value = "category", defaultValue = "") String category,
-			@RequestParam(name = "pageNo", defaultValue = "0") Integer pageNo,
-			@RequestParam(name = "pageSize", defaultValue = "12") Integer pageSize,
-			@RequestParam(defaultValue = "") String ch) {
-
-		List<Category> categories = categoryService.getAllActiveCategory();
-		m.addAttribute("paramValue", category);
-		m.addAttribute("categories", categories);
-
-//		List<Product> products = productService.getAllActiveProducts(category);
-//		m.addAttribute("products", products);
-		Page<Product> page = null;
-		if (StringUtils.isEmpty(ch)) {
-			page = productService.getAllActiveProductPagination(pageNo, pageSize, category);
-		} else {
-			page = productService.searchActiveProductPagination(pageNo, pageSize, category, ch);
-		}
-
-		List<Product> products = page.getContent();
-		m.addAttribute("products", products);
-		m.addAttribute("productsSize", products.size());
-
-		m.addAttribute("pageNo", page.getNumber());
-		m.addAttribute("pageSize", pageSize);
-		m.addAttribute("totalElements", page.getTotalElements());
-		m.addAttribute("totalPages", page.getTotalPages());
-		m.addAttribute("isFirst", page.isFirst());
-		m.addAttribute("isLast", page.isLast());
-
-		return "product";
-	}
-
-	@GetMapping("/product/{id}")
-	public String product(@PathVariable int id, Model m) {
-		Product productById = productService.getProductById(id);
-		m.addAttribute("product", productById);
-		return "view_product";
-	}
+	
 	@PostMapping("/saveUser")
 	public String saveUser(@ModelAttribute UserDtls user, @RequestParam("img") MultipartFile file, HttpSession session)
 	        throws IOException {
@@ -148,21 +192,27 @@ public class HomeController {
 	    if (existsEmail) {
 	        session.setAttribute("errorMsg", "Email already exists");
 	    } else {
+	        // Assign role based on the user's selection
+	        if ("buyer".equals(user.getRole())) {
+	            user.setRole("ROLE_USER");
+	        } else if ("seller".equals(user.getRole())) {
+	            user.setRole("ROLE_ADMIN");
+	        }
+
+	        // Set default image or uploaded image
 	        String imageName = file.isEmpty() ? "default.jpg" : file.getOriginalFilename();
 	        user.setProfileImage(imageName);
 	        UserDtls saveUser = userService.saveUser(user);
 
 	        if (!ObjectUtils.isEmpty(saveUser)) {
 	            if (!file.isEmpty()) {
-	                // Define the path where you want to save the uploaded files
-	                Path uploadPath = Paths.get("D:/Revature/Eclipse/shopping-cart-spring-boot-main/src/main/webapp/WEB-INF/views/img/profile_img");
+	                // Use relative path inside static folder
+	                File saveFile = new ClassPathResource("static/img/profile_img").getFile();
 
-	                // Create directories if they do not exist
-	                Files.createDirectories(uploadPath);
+	                Path path = Paths.get(saveFile.getAbsolutePath() + File.separator + file.getOriginalFilename());
 
-	                // Resolve the file path and save the file
-	                Path filePath = uploadPath.resolve(file.getOriginalFilename());
-	                Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+	                // Copy file to the path
+	                Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
 	            }
 	            session.setAttribute("succMsg", "Registered successfully");
 	        } else {
@@ -173,84 +223,66 @@ public class HomeController {
 	    return "redirect:/register";
 	}
 
-//	Forgot Password Code 
+    @GetMapping("/forgot-password")
+    public String showForgotPassword() {
+        return "forgot_password";
+    }
 
-	@GetMapping("/forgot-password")
-	public String showForgotPassword() {
-		return "forgot_password";
-	}
+    @PostMapping("/forgot-password")
+    public String processForgotPassword(@RequestParam String email, RedirectAttributes redirectAttributes, HttpServletRequest request) throws UnsupportedEncodingException, MessagingException {
+        UserDtls userByEmail = userService.getUserByEmail(email);
 
-	@PostMapping("/forgot-password")
-	public String processForgotPassword(@RequestParam String email, HttpSession session, HttpServletRequest request)
-			throws UnsupportedEncodingException, MessagingException {
+        if (ObjectUtils.isEmpty(userByEmail)) {
+            redirectAttributes.addFlashAttribute("errorMsg", "Invalid email");
+        } else {
+            String resetToken = UUID.randomUUID().toString();
+            userService.updateUserResetToken(email, resetToken);
+            String url = CommonUtil.generateUrl(request) + "/reset-password?token=" + resetToken;
+            Boolean sendMail = commonUtil.sendMail(url, email);
 
-		UserDtls userByEmail = userService.getUserByEmail(email);
+            if (sendMail) {
+                redirectAttributes.addFlashAttribute("succMsg", "Password Reset link sent to your email");
+            } else {
+                redirectAttributes.addFlashAttribute("errorMsg", "Something went wrong! Email not sent");
+            }
+        }
 
-		if (ObjectUtils.isEmpty(userByEmail)) {
-			session.setAttribute("errorMsg", "Invalid email");
-		} else {
+        return "redirect:/forgot-password";
+    }
 
-			String resetToken = UUID.randomUUID().toString();
-			userService.updateUserResetToken(email, resetToken);
+    @GetMapping("/reset-password")
+    public String showResetPassword(@RequestParam String token, Model m) {
+        UserDtls userByToken = userService.getUserByToken(token);
 
-			// Generate URL :
-			// http://localhost:8080/reset-password?token=sfgdbgfswegfbdgfewgvsrg
+        if (userByToken == null) {
+            m.addAttribute("msg", "Your link is invalid or expired!");
+            return "message";
+        }
+        m.addAttribute("token", token);
+        return "reset_password";
+    }
 
-			String url = CommonUtil.generateUrl(request) + "/reset-password?token=" + resetToken;
+    @PostMapping("/reset-password")
+    public String resetPassword(@RequestParam String token, @RequestParam String password, Model m) {
+        UserDtls userByToken = userService.getUserByToken(token);
+        if (userByToken == null) {
+            m.addAttribute("errorMsg", "Your link is invalid or expired!");
+            return "message";
+        } else {
+            userByToken.setPassword(passwordEncoder.encode(password));
+            userByToken.setResetToken(null);
+            userService.updateUser(userByToken);
+            m.addAttribute("msg", "Password changed successfully");
+            return "message";
+        }
+    }
 
-			Boolean sendMail = commonUtil.sendMail(url, email);
-
-			if (sendMail) {
-				session.setAttribute("succMsg", "Please check your email..Password Reset link sent");
-			} else {
-				session.setAttribute("errorMsg", "Somethong wrong on server ! Email not send");
-			}
-		}
-
-		return "redirect:/forgot-password";
-	}
-
-	@GetMapping("/reset-password")
-	public String showResetPassword(@RequestParam String token, HttpSession session, Model m) {
-
-		UserDtls userByToken = userService.getUserByToken(token);
-
-		if (userByToken == null) {
-			m.addAttribute("msg", "Your link is invalid or expired !!");
-			return "message";
-		}
-		m.addAttribute("token", token);
-		return "reset_password";
-	}
-
-	@PostMapping("/reset-password")
-	public String resetPassword(@RequestParam String token, @RequestParam String password, HttpSession session,
-			Model m) {
-
-		UserDtls userByToken = userService.getUserByToken(token);
-		if (userByToken == null) {
-			m.addAttribute("errorMsg", "Your link is invalid or expired !!");
-			return "message";
-		} else {
-			userByToken.setPassword(passwordEncoder.encode(password));
-			userByToken.setResetToken(null);
-			userService.updateUser(userByToken);
-			// session.setAttribute("succMsg", "Password change successfully");
-			m.addAttribute("msg", "Password change successfully");
-
-			return "message";
-		}
-
-	}
-
-	@GetMapping("/search")
-	public String searchProduct(@RequestParam String ch, Model m) {
-		List<Product> searchProducts = productService.searchProduct(ch);
-		m.addAttribute("products", searchProducts);
-		List<Category> categories = categoryService.getAllActiveCategory();
-		m.addAttribute("categories", categories);
-		return "product";
-
-	}
-
+    @GetMapping("/search")
+    public String searchProduct(@RequestParam String ch, Model m) {
+        List<Product> searchProducts = productService.searchProduct(ch);
+        m.addAttribute("products", searchProducts);
+        List<Category> categories = categoryService.getAllActiveCategory();
+        m.addAttribute("categories", categories);
+        return "product";
+    }
 }
