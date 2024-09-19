@@ -41,6 +41,17 @@ public class Product {
 	
 	private Boolean isActive;
 
+	
+	
+	public Product(Integer id) {
+	    this.id = id;
+	}
+
+
+	public Product() {
+		super();
+	}
+	
 	public Integer getId() {
 		return id;
 	}

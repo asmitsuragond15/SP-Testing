@@ -1,161 +1,90 @@
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ include file="base.jsp" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ include file="base.jsp"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="ISO-8859-1">
     <title>Product Page</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet"
+        href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
-    <!-- Internal CSS -->
     <style>
-        body {
-            background-color: #f8f9fa; /* Light background for the page */
-        }
-
-        .bg-primary {
-            background-color: #000 !important; /* Black background for the header section */
-        }
-
-        .text-dark {
-            color: #000 !important; /* Black text color for buttons */
-        }
-
-        .btn-light {
-            background-color: #fff; /* White background for buttons */
-            border-color: #ddd;
-        }
-
-        .btn-light:hover {
-            background-color: #f8f9fa; /* Slightly gray for hover */
-        }
-
-        .card {
-            border: none; /* Remove border for a cleaner look */
+        /* Advanced CSS for product cards */
+        .product-card {
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .card:hover {
-            transform: translateY(-10px); /* Slight lift effect on hover */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow effect on hover */
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
         }
 
-        .card-body {
-            background-color: #fff; /* White background for card bodies */
-            padding: 1.5rem; /* Increased padding */
+        /* Wishlist heart icon at the top-left */
+        .wishlist-heart {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+            color: white;
+            border: 2px solid white;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.3);
+            padding: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        .card img {
-            border-radius: 8px; /* Rounded corners for images */
+        .wishlist-heart:hover {
+            background-color: #ff4b4b;
+            color: white;
+            border-color: #ff4b4b;
+        }
+
+        /* Style adjustments for product details */
+        .product-card img {
+            border-radius: 8px;
             transition: transform 0.3s ease;
         }
 
-        .card img:hover {
-            transform: scale(1.05); /* Slight zoom effect on hover */
+        .product-card img:hover {
+            transform: scale(1.05);
         }
 
-        .list-group-item {
-            color: #000; /* Black text color for list items */
-            background-color: #fff; /* White background for list items */
-            border: 1px solid #ddd; /* Light border for list items */
-            border-radius: 5px; /* Rounded corners for list items */
+        .product-details {
+            margin-top: 10px;
         }
 
-        .list-group-item.active {
-            background-color: #000; /* Black background for active list item */
-            color: #fff; /* White text color for active list item */
+        .product-details p {
+            margin: 0;
+            padding: 5px 0;
         }
 
-        .fs-3, .fs-5, .fs-6 {
-            color: #000; /* Black text color for various headings */
+        .btn-view-details {
+            margin-top: 10px;
         }
 
-        .text-danger {
-            color: #dc3545; /* Bootstrap's danger color */
-        }
-
-        .pagination .page-item .page-link {
-            color: #000; /* Black color for pagination links */
-        }
-
-        .pagination .page-item.active .page-link {
-            background-color: #000; /* Black background for active pagination link */
-            color: #fff; /* White text color for active pagination link */
-        }
-
-        .product-title {
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
-
-        .product-price {
-            font-size: 1.1rem;
-            font-weight: bold;
-        }
-
-        .product-discount {
-            font-size: 1rem;
-            color: #28a745; /* Bootstrap success color */
-        }
-
-        .product-original-price {
-            font-size: 1rem;
-            text-decoration: line-through;
-            color: #6c757d; /* Bootstrap secondary color */
-        }
-
-        /* Improved Search Form Styles */
-        .search-container {
-            margin-top: 2rem; /* Add some top margin */
-        }
-
-        .search-box {
-            display: flex;
-            align-items: center;
-            border-radius: 50px; /* Rounded corners for the search box */
-            overflow: hidden;
-        }
-
-        .search-box input {
-            border: none;
-            border-radius: 50px; /* Match the container's rounded corners */
-            padding: 10px 20px;
-            font-size: 1rem;
-        }
-
-        .search-box button {
-            border-radius: 0; /* Remove rounded corners for the button */
-            background-color: #343a40; /* Dark background for the button */
-            color: #fff; /* White text color for the button */
-            border: none;
-            padding: 8px 16px; /* Reduced padding */
-            font-size: 0.9rem; /* Slightly smaller font size */
-            transition: background-color 0.3s ease;
-            max-width: 150px; /* Set a max width */
-        }
-
-        .search-box button:hover {
-            background-color: #495057; /* Slightly lighter color on hover */
-        }
-
-        /* Center align pagination controls */
-        .pagination-container {
-            display: flex;
-            justify-content: center; /* Center the pagination controls */
-            margin-top: 1rem; /* Add some top margin */
+        /* Responsive design for smaller devices */
+        @media (max-width: 768px) {
+            .product-card {
+                margin-bottom: 20px;
+            }
         }
     </style>
 </head>
 <body>
     <section>
-        <div class="container-fluid mt-5">
-            <div class="row search-container">
+        <div class="container-fluid bg-primary p-4 mt-5">
+            <div class="row">
                 <div class="col-md-8 offset-md-2">
                     <form action="/products" method="get">
-                        <div class="search-box">
-                            <input type="text" class="form-control" name="ch" placeholder="Search products...">
-                            <button class="btn btn-light text-dark">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="ch">
+                            <button class="btn btn-light text-dark ms-3 col-md-2">
                                 <i class="fa-solid fa-magnifying-glass"></i> Search
                             </button>
                         </div>
@@ -171,19 +100,20 @@
                         <div class="card-body">
                             <div class="list-group">
                                 <p class="fs-5">Category</p>
-                                <a href="/products" class="list-group-item list-group-item-action 
-                                    ${paramValue == '' ? 'active' : ''}" aria-current="true">All</a>
+                                <a href="/products"
+                                    class="list-group-item list-group-item-action ${paramValue == '' ? 'active' : ''}"
+                                    aria-current="true">All</a>
                                 <c:forEach var="c" items="${categories}">
-                                    <a href="/products?category=${c.name}" 
-                                       class="list-group-item list-group-item-action
-                                       ${paramValue == c.name ? 'active' : ''}">
-                                       ${c.name}
+                                    <a href="/products?category=${c.name}"
+                                        class="list-group-item list-group-item-action ${paramValue == c.name ? 'active' : ''}">
+                                        ${c.name}
                                     </a>
                                 </c:forEach>
                             </div>
                         </div>
                     </div>
                 </div>
+
                 <div class="col-md-10">
                     <div class="card">
                         <div class="card-body">
@@ -192,26 +122,24 @@
                                 <c:if test="${productsSize > 0}">
                                     <c:forEach var="p" items="${products}">
                                         <div class="col-md-3 mt-2">
-                                            <div class="card card-sh">
+                                            <div class="card product-card">
+                                                <!-- Heart icon for wishlist -->
+                                                <a href="/user/addWishlist?productId=${p.id}" class="wishlist-heart">
+                                                    <i class="fas fa-heart"></i>
+                                                </a>
+                                                
+                                                <!-- Product Image -->
                                                 <div class="card-body text-center">
-                                                    <img alt="" src="/img/product_img/${p.image}"
-                                                         width="150px" height="150px">
-                                                    <p class="product-title text-center mt-2">${p.title}</p>
-                                                    <div class="row text-center mt-2">
-                                                        <p class="product-price">
-                                                            <span>&#8377; ${p.discountPrice}</span>
+                                                    <img src="/img/product_img/${p.image}" alt="${p.title}" width="150" height="150">
+                                                    <div class="product-details">
+                                                        <p class="fs-5">${p.title}</p>
+                                                        <p class="fs-6 fw-bold">
+                                                            &#8377; ${p.discountPrice} <br>
+                                                            <span class="text-decoration-line-through text-secondary">&#8377; ${p.price}</span>
+                                                            <span class="fs-6 text-success">${p.discount}% off</span>
                                                         </p>
-                                                        <p class="product-original-price">
-                                                            <span>&#8377; ${p.price}</span>
-                                                        </p>
-                                                        <p class="product-discount">
-                                                            ${p.discount}% off
-                                                        </p>
-                                                        <a href="/product/${p.id}"
-                                                           class="btn btn-dark col-md-6 offset-md-3 mt-2">
-                                                           View Details
-                                                        </a>
                                                     </div>
+                                                    <a href="/product/${p.id}" class="btn btn-primary btn-view-details">View Details</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -223,9 +151,10 @@
                             </div>
                         </div>
                     </div>
-                    <!-- Start Pagination -->
-                    <div class="pagination-container">
-                        <div class="col-md-4">Total Products : ${totalElements}</div>
+
+                    <!-- Pagination -->
+                    <div class="row">
+                        <div class="col-md-4">Total Products: ${totalElements}</div>
                         <div class="col-md-6">
                             <c:if test="${productsSize > 0}">
                                 <nav aria-label="Page navigation example">
@@ -236,8 +165,8 @@
                                             </a>
                                         </li>
                                         <c:forEach var="i" begin="1" end="${totalPages}">
-                                            <li class="page-item ${pageNo == i ? 'active' : ''}">
-                                                <a class="page-link" href="/products?pageNo=${i}">${i}</a>
+                                            <li class="page-item ${pageNo + 1 == i ? 'active' : ''}">
+                                                <a class="page-link" href="/products?pageNo=${i - 1}">${i}</a>
                                             </li>
                                         </c:forEach>
                                         <li class="page-item ${isLast ? 'disabled' : ''}">
@@ -250,7 +179,6 @@
                             </c:if>
                         </div>
                     </div>
-                    <!-- End Pagination -->
                 </div>
             </div>
         </div>

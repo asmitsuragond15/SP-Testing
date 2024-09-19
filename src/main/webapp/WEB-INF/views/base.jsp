@@ -63,11 +63,14 @@
                             </c:if>
                             <c:if test="${user.role == 'ROLE_USER'}">
                                 <li class="nav-item"><a class="nav-link active" aria-current="page" href="/"><i class="fa-solid fa-house"></i> Home</a></li>
+                                                             <li class="nav-item"><a class="nav-link active" aria-current="page" href="/user/wishlist"><i class="fa-solid fa-heart"></i> Wishlist</a></li>
+                                
                             </c:if>
                         </c:otherwise>
                     </c:choose>
 
                     <li class="nav-item"><a class="nav-link active" aria-current="page" href="/products">Product</a></li>
+                  
 
               
                 </ul>

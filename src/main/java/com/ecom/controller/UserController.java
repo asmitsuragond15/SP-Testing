@@ -13,19 +13,22 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.ecom.model.Cart;
 import com.ecom.model.Category;
 import com.ecom.model.OrderRequest;
 import com.ecom.model.ProductOrder;
 import com.ecom.model.UserDtls;
+import com.ecom.model.Wishlist;
 import com.ecom.repository.UserRepository;
 import com.ecom.service.CartService;
 import com.ecom.service.CategoryService;
 import com.ecom.service.OrderService;
 import com.ecom.service.UserService;
+import com.ecom.service.WishlistService;
 import com.ecom.util.CommonUtil;
 import com.ecom.util.OrderStatus;
 
@@ -57,6 +60,56 @@ public class UserController {
 		return "user/home";
 	}
 
+	@Autowired
+	private WishlistService wishlistService;
+
+	// Add to wishlist
+	@GetMapping("/addWishlist")
+	public String addToWishlist(@RequestParam Integer productId, Principal p, HttpSession session) {
+	    UserDtls user = getLoggedInUserDetails(p);
+	    Wishlist wishlist = wishlistService.addToWishlist(user, productId);
+	    
+	  
+	    // Clear the message after redirect
+	    return "redirect:/product/" + productId;
+	}
+
+	// Remove from wishlist
+	@GetMapping("/removeWishlist")
+	public String removeFromWishlist(@RequestParam Integer productId, Principal p, HttpSession session) {
+	    UserDtls user = getLoggedInUserDetails(p);
+	    wishlistService.removeFromWishlist(user, productId);
+	    session.setAttribute("succMsg", "Product removed from wishlist");
+	    
+	    // Clear the message after redirect
+	    return "redirect:/user/wishlist";
+	}
+
+	@GetMapping("/wishlist")
+	public String viewWishlist(Principal p, Model m) {
+	    // Retrieve the logged-in user's details
+	    UserDtls user = getLoggedInUserDetails(p);
+	    
+	    // Fetch the wishlist for the logged-in user
+	    List<Wishlist> wishlist = wishlistService.getWishlistByUser(user);
+	    m.addAttribute("wishlist", wishlist);
+
+	    // Safely get the session and remove any success or error messages
+	    ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+	    if (attr != null) {
+	        HttpSession session = attr.getRequest().getSession(false); // Use false to avoid creating a new session
+	        if (session != null) {
+	            session.removeAttribute("succMsg");
+	            session.removeAttribute("errorMsg");
+	        }
+	    }
+	    
+	    return "user/wishlist";
+	}
+
+	
+	
+	
 	@ModelAttribute
 	public void getUserDetails(Principal p, Model m) {
 		if (p != null) {
@@ -123,7 +176,7 @@ public class UserController {
 	}
 
 	@PostMapping("/save-order")
-	public String saveOrder(@ModelAttribute OrderRequest request, Principal p, RedirectAttributes redirectAttributes) throws Exception {
+	public String saveOrder(@ModelAttribute OrderRequest request, Principal p) throws Exception {
 		// System.out.println(request);
 		UserDtls user = getLoggedInUserDetails(p);
 		orderService.saveOrder(user.getId(), request);

@@ -110,7 +110,7 @@ public class HomeController {
     public String products(Model m, @RequestParam(value = "category", defaultValue = "") String category,
             @RequestParam(name = "pageNo", defaultValue = "0") Integer pageNo,
             @RequestParam(name = "pageSize", defaultValue = "12") Integer pageSize,
-            @RequestParam(defaultValue = "") String ch) {
+            @RequestParam(defaultValue = "") String ch, Principal principal) {
 
         List<Category> categories = categoryService.getAllActiveCategory();
         m.addAttribute("paramValue", category);
@@ -130,6 +130,12 @@ public class HomeController {
         m.addAttribute("totalPages", page.getTotalPages());
         m.addAttribute("isFirst", page.isFirst());
         m.addAttribute("isLast", page.isLast());
+        if (principal != null) {
+	        UserDtls user = userService.getUserByEmail(principal.getName());
+	        m.addAttribute("userRole", user.getRole()); // Add user role to model
+	    } else {
+	        m.addAttribute("userRole", "ROLE_GUEST"); // Default role if not logged in
+	    }
 
         return "product";
     }
