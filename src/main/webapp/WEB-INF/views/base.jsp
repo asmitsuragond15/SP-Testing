@@ -5,7 +5,9 @@
     <meta charset="ISO-8859-1">
     <title>Insert title here</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
+ <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <!-- Internal CSS -->
     <style>
         body {
@@ -67,14 +69,7 @@
 
                     <li class="nav-item"><a class="nav-link active" aria-current="page" href="/products">Product</a></li>
 
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Category</a>
-                        <ul class="dropdown-menu">
-                            <c:forEach var="category" items="${categories}">
-                                <li><a class="dropdown-item" href="/products?category=${category.name}">${category.name}</a></li>
-                            </c:forEach>
-                        </ul>
-                    </li>
+              
                 </ul>
 
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">

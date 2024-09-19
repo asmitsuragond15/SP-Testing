@@ -37,12 +37,13 @@
             font-size: 3rem;
             color: #007bff;
         }
+
     </style>
 </head>
 <body>
     <section>
         <div class="container p-5">
-            <p class="text-center fs-3 mt-4 fw-bold">Admin Dashboard</p>
+            <p class="text-center fs-3 mt-4 ">Admin Dashboard</p>
             <div class="row p-5">
                 <div class="col-md-4 mt-2">
                     <a href="/admin/loadAddProduct" class="text-decoration-none">

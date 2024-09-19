@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.ecom.model.Cart;
 import com.ecom.model.Category;
@@ -122,7 +123,7 @@ public class UserController {
 	}
 
 	@PostMapping("/save-order")
-	public String saveOrder(@ModelAttribute OrderRequest request, Principal p) throws Exception {
+	public String saveOrder(@ModelAttribute OrderRequest request, Principal p, RedirectAttributes redirectAttributes) throws Exception {
 		// System.out.println(request);
 		UserDtls user = getLoggedInUserDetails(p);
 		orderService.saveOrder(user.getId(), request);
