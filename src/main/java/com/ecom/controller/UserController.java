@@ -16,15 +16,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.ecom.model.Cart;
 import com.ecom.model.Category;
 import com.ecom.model.OrderRequest;
+import com.ecom.model.Product;
 import com.ecom.model.ProductOrder;
 import com.ecom.model.UserDtls;
 import com.ecom.model.Wishlist;
 import com.ecom.repository.UserRepository;
 import com.ecom.service.CartService;
+import com.ecom.service.ProductService;
 import com.ecom.service.CategoryService;
 import com.ecom.service.OrderService;
 import com.ecom.service.UserService;
@@ -42,6 +45,8 @@ public class UserController {
 	@Autowired
 	private CategoryService categoryService;
 
+	
+	
 	@Autowired
 	private CartService cartService;
 
@@ -54,7 +59,9 @@ public class UserController {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
-
+	@Autowired
+	private ProductService productService;
+	
 	@GetMapping("/")
 	public String home() {
 		return "user/home";
@@ -126,15 +133,16 @@ public class UserController {
 
 	@GetMapping("/addCart")
 	public String addToCart(@RequestParam Integer pid, @RequestParam Integer uid, HttpSession session) {
-		Cart saveCart = cartService.saveCart(pid, uid);
+	    Cart saveCart = cartService.saveCart(pid, uid);
 
-		if (ObjectUtils.isEmpty(saveCart)) {
-			session.setAttribute("errorMsg", "Product add to cart failed");
-		} else {
-			session.setAttribute("succMsg", "Product added to cart");
-		}
-		return "redirect:/product/" + pid;
+	    if (ObjectUtils.isEmpty(saveCart)) {
+	        session.setAttribute("errorMsg", "Product add to cart failed");
+	    } else {
+	        session.setAttribute("addToCartMsg", "Product added to cart"); // Change to this key
+	    }
+	    return "redirect:/product/" + pid;
 	}
+
 
 	@GetMapping("/cart")
 	public String loadCartPage(Principal p, Model m) {
@@ -263,5 +271,37 @@ public class UserController {
 
 		return "redirect:/user/profile";
 	}
+	
+	@GetMapping("/orderNow")
+	public String orderNow(@RequestParam Integer pid, Principal principal, Model model, RedirectAttributes redirectAttributes) {
+	    // Redirect to sign-in if the user is not logged in
+	    if (principal == null) {
+	        return "redirect:/signin";
+	    }
+
+	    // Fetch the product by ID
+	    Product product = productService.getProductById(pid);
+
+	    // Check if the product is valid
+	    if (product == null) {
+	        redirectAttributes.addFlashAttribute("errorMsg", "Invalid product. Please try again.");
+	        return "redirect:/products";  // Redirect to the products list page
+	    }
+
+	    // Pricing details
+	    double deliveryFee = 50.00;   // Suggest making this dynamic or configurable
+	    double tax = 10.00;           // Suggest dynamic or based on region
+	    double totalPrice = product.getDiscountPrice();
+	    double totalOrderPrice = totalPrice + deliveryFee + tax;
+
+	    // Add necessary data to the model
+	    model.addAttribute("orderPrice", totalPrice);
+	    model.addAttribute("totalOrderPrice", totalOrderPrice);
+	    model.addAttribute("product", product);
+
+	    // Return the order confirmation page
+	    return "user/order";   // Ensure this JSP is set up to display order details
+	}
+
 
 }

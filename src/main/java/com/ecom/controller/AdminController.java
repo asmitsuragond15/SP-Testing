@@ -8,10 +8,13 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ecom.config.AppConfig;
 import com.ecom.model.Category;
 import com.ecom.model.Product;
 import com.ecom.model.ProductOrder;
@@ -62,6 +66,9 @@ public class AdminController {
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+	
+	@Autowired
+	private AppConfig restTemplate;
 
 	@ModelAttribute
 	public void getUserDetails(Principal p, Model m) {
@@ -82,6 +89,7 @@ public class AdminController {
 		return "admin/index";
 	}
 
+	
 	@GetMapping("/loadAddProduct")
 	public String loadAddProduct(Model m) {
 		List<Category> categories = categoryService.getAllCategory();
@@ -90,22 +98,33 @@ public class AdminController {
 	}
 
 	@GetMapping("/category")
-	public String category(Model m, @RequestParam(name = "pageNo", defaultValue = "0") Integer pageNo,
-			@RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize) {
-		// m.addAttribute("categorys", categoryService.getAllCategory());
-		Page<Category> page = categoryService.getAllCategorPagination(pageNo, pageSize);
-		List<Category> categorys = page.getContent();
-		m.addAttribute("categorys", categorys);
-
-		m.addAttribute("pageNo", page.getNumber());
-		m.addAttribute("pageSize", pageSize);
-		m.addAttribute("totalElements", page.getTotalElements());
-		m.addAttribute("totalPages", page.getTotalPages());
-		m.addAttribute("isFirst", page.isFirst());
-		m.addAttribute("isLast", page.isLast());
-
-		return "admin/category";
+	public String category(Model m, @RequestParam(name = "pageNo", defaultValue =
+	"0") Integer pageNo,
+	@RequestParam(name = "pageSize", defaultValue = "10") Integer
+	pageSize) {
+	String apiUrl = String.format("http://localhost:8083/api/category?pageNo=%d&pageSize=%d", pageNo, pageSize);
+	// Call the REST API
+	ResponseEntity<Map> response = restTemplate.getForEntity(apiUrl,
+	Map.class);
+	// Check if the response is valid
+	if (response != null && response.getStatusCode() == HttpStatus.OK) {
+	Map<String, Object> responseBody = response.getBody();
+	// Add attributes to the model
+	m.addAttribute("categorys", responseBody.get("categorys"));
+	m.addAttribute("pageNo", responseBody.get("pageNo"));
+	m.addAttribute("pageSize", responseBody.get("pageSize"));
+	m.addAttribute("totalElements",
+	responseBody.get("totalElements"));
+	m.addAttribute("totalPages", responseBody.get("totalPages"));
+	m.addAttribute("isFirst", responseBody.get("isFirst"));
+	m.addAttribute("isLast", responseBody.get("isLast"));
+	} else {
+	// Handle error cases if the REST API call fails
+	m.addAttribute("error", "Failed to load categories.");
 	}
+	return "admin/category";
+	}
+
 
 	@PostMapping("/saveCategory")
 	public String saveCategory(@ModelAttribute Category category, @RequestParam("file") MultipartFile file,

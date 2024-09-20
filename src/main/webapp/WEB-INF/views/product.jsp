@@ -11,12 +11,18 @@
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
+        body {
+            background-color: #fff; /* White background */
+            color: #333; /* Dark text color */
+        }
+
         /* Advanced CSS for product cards */
         .product-card {
             position: relative;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #ccc; /* Light gray border */
         }
 
         .product-card:hover {
@@ -30,10 +36,9 @@
             top: 10px;
             left: 10px;
             font-size: 24px;
-            color: white;
-            border: 2px solid white;
+            color: #ff4b4b; /* Red color for heart */
+            background-color: rgba(255, 255, 255, 0.8); /* Light background */
             border-radius: 50%;
-            background-color: rgba(255, 255, 255, 0.3);
             padding: 6px;
             cursor: pointer;
             transition: background-color 0.3s ease, color 0.3s ease;
@@ -42,7 +47,6 @@
         .wishlist-heart:hover {
             background-color: #ff4b4b;
             color: white;
-            border-color: #ff4b4b;
         }
 
         /* Style adjustments for product details */
@@ -66,7 +70,18 @@
 
         .btn-view-details {
             margin-top: 10px;
+            background-color:#343a40;
         }
+        
+        .page-item.active .page-link
+        {
+        background-color:#343a40;
+        }
+        .list-group-item.active
+        {
+        background-color:#343a40;
+        }
+
 
         /* Responsive design for smaller devices */
         @media (max-width: 768px) {
@@ -78,14 +93,14 @@
 </head>
 <body>
     <section>
-        <div class="container-fluid bg-primary p-4 mt-5">
+        <div class="container-fluid p-4 mt-5">
             <div class="row">
                 <div class="col-md-8 offset-md-2">
                     <form action="/products" method="get">
                         <div class="input-group">
                             <input type="text" class="form-control" name="ch">
-                            <button class="btn btn-light text-dark ms-3 col-md-2">
-                                <i class="fa-solid fa-magnifying-glass"></i> Search
+                            <button class="btn bg-dark text-white ms-3 col-md-2">
+                                <i class="fa-solid  "></i> Search
                             </button>
                         </div>
                     </form>
@@ -101,7 +116,7 @@
                             <div class="list-group">
                                 <p class="fs-5">Category</p>
                                 <a href="/products"
-                                    class="list-group-item list-group-item-action ${paramValue == '' ? 'active' : ''}"
+                                    class="list-group-item   list-group-item-action ${paramValue == '' ? 'active' : ''}"
                                     aria-current="true">All</a>
                                 <c:forEach var="c" items="${categories}">
                                     <a href="/products?category=${c.name}"
@@ -165,12 +180,12 @@
                                             </a>
                                         </li>
                                         <c:forEach var="i" begin="1" end="${totalPages}">
-                                            <li class="page-item ${pageNo + 1 == i ? 'active' : ''}">
+                                            <li class="page-item bg-dark ${pageNo + 1 == i ? 'active' : ''}">
                                                 <a class="page-link" href="/products?pageNo=${i - 1}">${i}</a>
                                             </li>
                                         </c:forEach>
                                         <li class="page-item ${isLast ? 'disabled' : ''}">
-                                            <a class="page-link" href="/products?pageNo=${pageNo + 1}" aria-label="Next">
+                                            <a class="page-link " href="/products?pageNo=${pageNo + 1}" aria-label="Next">
                                                 <span aria-hidden="true">&raquo;</span>
                                             </a>
                                         </li>

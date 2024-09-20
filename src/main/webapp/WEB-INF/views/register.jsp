@@ -3,297 +3,155 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Register</title>
-<link rel="stylesheet"
-	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-<link
-	href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
-	rel="stylesheet" id="bootstrap-css">
-<script
-	src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-<script
-	src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<style>
-html, body {
-	margin: 0;
-	padding: 0;
-	width: 100%;
-	height: 100%;
-	overflow-x: hidden; /* Prevents horizontal scrolling */
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <style>
+        body {
+            background-color: #212529; /* Dark background */
+            font-family: Arial, sans-serif;
+            color: #fff; /* White text */
+        }
 
-body {
-	background-image:
-		url("https://assets.bacancytechnology.com/main-boot-5/images/ecommerce-development/banner.jpg?v-1");
-	background-size: cover;
-	background-repeat: no-repeat;
-	background-position: center center;
-}
+        .form-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #343a40; /* Darker container */
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
 
-.form-container {
-	margin-right: 350px;
-	align-items: center;
-	margin-top: 50px;
-	width: 1000px;
-}
+        .card-header {
+            background-color: #000; /* Black header */
+            color: white;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+        }
 
-.card {
-	border-radius: 15px;
-	border: 1px solid #ddd;
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-	background: #042554;
-}
+        .form-group label {
+            font-weight: bold;
+            color: #fff; /* White labels */
+        }
 
-.card-header {
-	background: #273746;
-	color: #17202a;
-	border-bottom: 1px solid #ddd;
-	border-top-left-radius: 15px;
-	border-top-right-radius: 15px;
-}
+        .input-form {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            transition: border 0.3s;
+            background-color: #495057; /* Darker input background */
+            color: white; /* White text for inputs */
+        }
 
-.card-body {
-	padding: 30px;
-}
+        .input-form:focus {
+            border-color: #ffc107; /* Bootstrap yellow */
+            outline: none;
+        }
 
-.form-group label {
-	color: white;
-	font-weight: bold;
-}
+        .button {
+            background-color: #ffc107; /* Bootstrap yellow */
+            color: black;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
 
-.input-form {
-	border: 1px solid #ddd;
-	color: white;
-	border-radius: 10px;
-	height: 40px;
-	display: flex;
-	align-items: center;
-	padding-left: 10px;
-	background-color: black;
-	transition: border 0.3s ease;
-}
+        .button:hover {
+            background-color: #e0a800; /* Darker yellow on hover */
+        }
 
-.input-form input {
-	border: none;
-	width: 100%;
-	height: 100%;
-	border-radius: 10px;
-}
+        .card-footer a {
+            color: #ffc107; /* Bootstrap yellow */
+            text-decoration: none;
+        }
 
-.input-form:focus-within {
-	border: 1px solid #007bff;
-}
+        .card-footer a:hover {
+            text-decoration: underline;
+        }
 
-.button {
-	background-color: #007bff;
-	border: none;
-	border-radius: 50px;
-	padding: 10px 20px;
-	color: #fff;
-	font-weight: bold;
-	font-size: 16px;
-	cursor: pointer;
-	transition: background-color 0.3s, transform 0.3s;
-	text-align: center;
-	display: block;
-	width: 100%;
-}
-
-.button:hover {
-	background-color: #0056b3;
-	transform: scale(1.05);
-}
-
-.card-footer {
-	background-color: #f8f9fa;
-}
-
-.card-footer a {
-	color: #007bff;
-	font-weight: bold;
-	text-decoration: none;
-}
-
-.card-footer a:hover {
-	text-decoration: underline;
-}
-
-.form-row {
-	margin-bottom: 1rem;
-}
-
-.form-group {
-	margin-bottom: 1.5rem;
-}
-</style>
+        @media (max-width: 576px) {
+            .form-container {
+                margin: 20px;
+                padding: 15px;
+            }
+        }
+    </style>
 </head>
 <body>
-	<div class="container form-container">
-		<div class="row justify-content-center">
-			<div class="col-md-8">
-				<!-- Adjusted width -->
-				<div class="card shadow p-3 mb-5 rounded">
-					<div class="card-header text-center">
-						<!-- Display Success Message -->
-						<c:if test="${not empty sessionScope.succMsg}">
-							<div class="alert alert-success" role="alert">
-								${sessionScope.succMsg}
-								<c:remove var="sessionScope.succMsg" />
-							</div>
-						</c:if>
-						<!-- Display Error Message -->
-						<c:if test="${not empty sessionScope.errorMsg}">
-							<div class="alert alert-danger" role="alert">
-								${sessionScope.errorMsg}
-								<c:remove var="sessionScope.errorMsg" />
-							</div>
-						</c:if>
-					</div>
-					<div class="card-body">
-						<form class="form" action="/saveUser"
-							enctype="multipart/form-data" method="post">
-							<!-- Row 1: Full Name and Mobile Number -->
-							<div class="form-row">
-								<div class="col-md-6">
-									<div class="form-group">
-										<label for="name">Full Name</label>
-										<div class="input-form">
-											<input id="name" placeholder="Enter your Full Name"
-												type="text" name="name" required>
-										</div>
-									</div>
-								</div>
-								<div class="col-md-6">
-									<div class="form-group">
-										<label for="mobileNumber">Mobile Number</label>
-										<div class="input-form">
-											<input id="mobileNumber"
-												placeholder="Enter your Mobile Number" type="number"
-												name="mobileNumber" required>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<!-- Row 2: Email and Address -->
-							<div class="form-row">
-								<div class="col-md-6">
-									<div class="form-group">
-										<label for="email">Email</label>
-										<div class="input-form">
-											<input id="email" placeholder="Enter your Email" type="email"
-												name="email" required>
-										</div>
-									</div>
-								</div>
-								<div class="col-md-6">
-									<div class="form-group">
-										<label for="address">Address</label>
-										<div class="input-form">
-											<input id="address" placeholder="Enter your Address"
-												type="text" name="address" required>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<!-- Row 3: City and State -->
-							<div class="form-row">
-								<div class="col-md-6">
-									<div class="form-group">
-										<label for="city">City</label>
-										<div class="input-form">
-											<input id="city" placeholder="Enter your City" type="text"
-												name="city" required>
-										</div>
-									</div>
-								</div>
-								<div class="col-md-6">
-									<div class="form-group">
-										<label for="state">State</label>
-										<div class="input-form">
-											<input id="state" placeholder="Enter your State" type="text"
-												name="state" required>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<!-- Row 4: Pincode and Password -->
-							<div class="form-row">
-								<div class="col-md-6">
-									<div class="form-group">
-										<label for="pincode">Pincode</label>
-										<div class="input-form">
-											<input id="pincode" placeholder="Enter your Pincode"
-												type="number" name="pincode" required>
-										</div>
-									</div>
-								</div>
-								<div class="col-md-6">
-									<div class="form-group">
-										<label for="password">Password</label>
-										<div class="input-form">
-											<input id="password" placeholder="Enter your Password"
-												type="password" name="password" required>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<!-- Row 5: Confirm Password and Profile Image -->
-							<div class="form-row">
-								<div class="col-md-6">
-									<div class="form-group">
-										<label for="confirmpassword">Confirm Password</label>
-										<div class="input-form">
-											<input id="confirmpassword"
-												placeholder="Confirm your Password" type="password"
-												name="confirmpassword" required>
-										</div>
-									</div>
-								</div>
-								<div class="col-md-6">
-									<div class="form-group">
-										<label for="img">Profile Image</label>
-										<div class="input-form">
-											<input id="img" type="file" name="img">
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<div class="form-row">
-								<div class="col-md-6">
-									<div class="form-group">
-										<label for="userRole">User Role</label>
-										<div class="input-form">
-											<select id="userRole" name="role" required>
-												<option value="buyer" selected>Buyer</option>
-												<option value="seller">Seller</option>
-											</select>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<button type="submit" class="button mt-4">Register</button>
-							<div class="card-footer text-center mt-3">
-								Have an account? <a href="/signin" class="text-decoration-none">Login</a>
-							</div>
-						</form>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<!-- Bootstrap JS Bundle with Popper -->
-	<script
-		src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
-	<script
-		src="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <div class="form-container">
+        <div class="card">
+            <div class="card-header text-center">
+                <h3>Register</h3>
+            </div>
+            <div class="card-body">
+                <c:if test="${not empty sessionScope.succMsg}">
+                    <div class="alert alert-success" role="alert">${sessionScope.succMsg}</div>
+                </c:if>
+                <c:if test="${not empty sessionScope.errorMsg}">
+                    <div class="alert alert-danger" role="alert">${sessionScope.errorMsg}</div>
+                </c:if>
+                <form action="/saveUser" enctype="multipart/form-data" method="post">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input id="name" class="input-form form-control" placeholder="Enter your Full Name" type="text" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="mobileNumber">Mobile Number</label>
+                        <input id="mobileNumber" class="input-form form-control" placeholder="Enter your Mobile Number" type="number" name="mobileNumber" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input id="email" class="input-form form-control" placeholder="Enter your Email" type="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Address</label>
+                        <input id="address" class="input-form form-control" placeholder="Enter your Address" type="text" name="address" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="city">City</label>
+                        <input id="city" class="input-form form-control" placeholder="Enter your City" type="text" name="city" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="state">State</label>
+                        <input id="state" class="input-form form-control" placeholder="Enter your State" type="text" name="state" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pincode">Pincode</label>
+                        <input id="pincode" class="input-form form-control" placeholder="Enter your Pincode" type="number" name="pincode" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input id="password" class="input-form form-control" placeholder="Enter your Password" type="password" name="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmpassword">Confirm Password</label>
+                        <input id="confirmpassword" class="input-form form-control" placeholder="Confirm your Password" type="password" name="confirmpassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="img">Profile Image</label>
+                        <input id="img" class="input-form form-control" type="file" name="img">
+                    </div>
+                    <div class="form-group">
+                        <label for="userRole">User Role</label>
+                        <select id="userRole" class="input-form form-control" name="role" required>
+                            <option value="buyer" selected>Buyer</option>
+                            <option value="seller">Seller</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="button">Register</button>
+                </form>
+            </div>
+            <div class="card-footer text-center">
+                Have an account? <a href="/signin">Login</a>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

@@ -9,7 +9,7 @@
     <style>
         /* Custom CSS */
         body {
-            background-color: #fdfefe;
+            background-color: #171717;
             background-image: url("https://assets.bacancytechnology.com/main-boot-5/images/ecommerce-development/banner.jpg?v-1");
             background-size: cover;
             background-repeat: no-repeat;
@@ -20,7 +20,7 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
-            background: linear-gradient(45deg, skyblue, darkblue);
+            background: linear-gradient(45deg, #000, #333); /* Dark black gradient */
             padding: 30px;
             width: 600px; /* Increased width */
             border: 2px solid white;
@@ -28,18 +28,20 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
             transition: background 0.3s ease;
             margin-right: 400px !important;
+            color: white; /* White text */
         }
 
         .form:hover {
-            background: linear-gradient(45deg, darkblue, skyblue);
+            background: linear-gradient(45deg, #333, #000); /* Dark black gradient */
         }
 
         ::placeholder {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+            color: white; /* White placeholder text */
         }
 
         .form button {
             align-self: flex-end;
+            color: white; /* White text */
         }
 
         .flex-column > label {
@@ -94,7 +96,7 @@
         .span {
             font-size: 14px;
             margin-left: 5px;
-            color: white;
+            color: white; /* White text */
             font-weight: 500;
             cursor: pointer;
         }
@@ -110,9 +112,9 @@
             transition: ease-out 0.5s;
             border: 2px solid;
             border-radius: 10em;
-            box-shadow: inset 0 0 0 0 blue;
+            box-shadow: inset 0 0 0 0 black;
             margin: 20px 0 10px 0;
-            color: white;
+            color: white; /* White text */
             font-size: 15px;
             font-weight: 500;
             height: 50px;
@@ -122,7 +124,7 @@
 
         .button-submit:hover {
             color: white;
-            box-shadow: inset 0 -100px 0 0 royalblue;
+            box-shadow: inset 0 -100px 0 0 black;
         }
 
         .button-submit:active {
@@ -131,7 +133,7 @@
 
         .p {
             text-align: center;
-            color: white;
+            color: white; /* White text */
             font-size: 14px;
             margin: 5px 0;
         }
@@ -173,7 +175,7 @@
                         <!-- Error Message -->
                         <c:if test="${param.error != null}">
                             <div class="alert alert-danger">
-                              <h1 style="color:red;"> <c:out value="${sessionScope.SPRING_SECURITY_LAST_EXCEPTION.message}" /></h1> 
+                                <h1 style="color:red;"><c:out value="${sessionScope.SPRING_SECURITY_LAST_EXCEPTION.message}" /></h1> 
                             </div>
                         </c:if>
                         <!-- Success Message -->

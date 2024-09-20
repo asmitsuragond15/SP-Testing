@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ page import="com.ecom.service.CommnServiceImpl" %>
+<%@ include file="../base.jsp" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>

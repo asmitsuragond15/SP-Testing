@@ -82,12 +82,9 @@
                             <li class="nav-item"><a class="nav-link active" aria-current="page" href="/register">REGISTER</a></li>
                         </c:when>
                         <c:otherwise>
-                            <c:if test="${user.role == 'ROLE_USER'}">
-                                <li class="nav-item"><a class="nav-link active" aria-current="page" href="/user/cart"><i class="fa-solid fa-cart-shopping"></i> Cart [ ${countCart} ]</a></li>
-                            </c:if>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fa-solid fa-user"></i> ${user.name}
+                                    <i class="fa-solid fa-user"></i>
                                 </a>
                                 <ul class="dropdown-menu">
                                     <c:if test="${user.role == 'ROLE_USER'}">
@@ -102,6 +99,10 @@
                                     <li><a class="dropdown-item" href="/logout">Logout</a></li>
                                 </ul>
                             </li>
+                            <c:if test="${user.role == 'ROLE_USER'}">
+                                <li class="nav-item"><a class="nav-link active" aria-current="page" href="/user/cart"><i class="fa-solid fa-cart-shopping"></i> Cart [ ${countCart} ]</a></li>
+                            </c:if>
+                           
                         </c:otherwise>
                     </c:choose>
                 </ul>
